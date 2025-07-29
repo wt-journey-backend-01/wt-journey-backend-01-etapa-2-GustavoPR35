@@ -171,7 +171,7 @@ router.patch('/agentes/:id', agentesController.patchAgente)
  *         required: true
  *         description: ID do agente
  *     responses:
- *       200:
+ *       204:
  *         description: Agente removido com sucesso
  *       404:
  *         description: Agente não encontrado

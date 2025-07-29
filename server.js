@@ -3,7 +3,7 @@ const app = express()
 const agentesRouter = require('./routes/agentesRoutes')
 const casosRouter = require('./routes/casosRoutes')
 const setupSwagger = require('./docs/swagger')
-const PORT = 3192
+const PORT = 3000
 
 app.use(express.json())
 

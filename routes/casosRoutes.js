@@ -234,7 +234,7 @@ router.patch('/casos/:id', casosController.patchCaso)
  *         required: true
  *         description: ID do caso
  *     responses:
- *       200:
+ *       204:
  *         description: Caso removido com sucesso
  *       404:
  *         description: Caso não encontrado
