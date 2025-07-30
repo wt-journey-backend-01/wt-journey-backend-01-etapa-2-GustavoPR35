@@ -1,4 +1,5 @@
 const agentesRepository = require('../repositories/agentesRepository')
+const { v4: uuidv4, validate: uuidValidate } = require('uuid')
 
 // GET /agentes
 function getAllAgentes(req, res) {
@@ -34,6 +35,12 @@ function getAgenteById(req, res) {
     const { id } = req.params
     const agente = agentesRepository.getAgenteById(id)
 
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
+
     if (!agente) {
         return res.status(404).json({
             error: 'Agente não encontrado'
@@ -45,16 +52,16 @@ function getAgenteById(req, res) {
 
 // POST /agentes
 function insertAgente(req, res) {
-    const { id, nome, dataDeIncorporacao, cargo } = req.body
+    const { nome, dataDeIncorporacao, cargo } = req.body
 
-    if (!id || !nome || !dataDeIncorporacao || !cargo) {
+    if (!nome || !dataDeIncorporacao || !cargo) {
         return res.status(400).json({
-            erro: 'Todos os dados são obrigatórios: id, nome, dataDeIncorporacao, cargo'
+            erro: 'Todos os dados são obrigatórios: nome, dataDeIncorporacao, cargo'
         })
     }
 
     const agente = {
-        id,
+        id: uuidv4(), // Gera automaticamente um UUID único
         nome,
         dataDeIncorporacao,
         cargo
@@ -68,6 +75,12 @@ function insertAgente(req, res) {
 function putAgente(req, res) {
     const { id } = req.params
     const { nome, dataDeIncorporacao, cargo } = req.body
+
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
 
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {
@@ -97,6 +110,12 @@ function patchAgente(req, res) {
     const { id } = req.params
     const updateData = req.body
 
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
+
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {
         return res.status(404).json({
@@ -122,6 +141,12 @@ function patchAgente(req, res) {
 // DELETE /agentes/:id
 function deleteAgente(req, res) {
     const { id } = req.params
+
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
 
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {

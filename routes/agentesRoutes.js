@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const agentesController = require('../controllers/agentesControllers')
+const agentesController = require('../controllers/agentesController')
 
 /**
  * @swagger
@@ -12,13 +12,27 @@ const agentesController = require('../controllers/agentesControllers')
  *     Agente:
  *       type: object
  *       required:
- *         - id
  *         - nome
  *         - dataDeIncorporacao
  *         - cargo
  *       properties:
  *         id:
  *           type: string
+ *           readOnly: true
+ *           description: ID único gerado automaticamente
+ *         nome:
+ *           type: string
+ *         dataDeIncorporacao:
+ *           type: string
+ *         cargo:
+ *           type: string
+ *     AgenteInput:
+ *       type: object
+ *       required:
+ *         - nome
+ *         - dataDeIncorporacao
+ *         - cargo
+ *       properties:
  *         nome:
  *           type: string
  *         dataDeIncorporacao:
@@ -44,7 +58,7 @@ const agentesController = require('../controllers/agentesControllers')
  *               items:
  *                 $ref: '#/components/schemas/Agente'
  */
-router.get('/agentes', agentesController.getAllAgentes)
+router.get('/', agentesController.getAllAgentes)
 
 /**
  * @swagger
@@ -69,7 +83,7 @@ router.get('/agentes', agentesController.getAllAgentes)
  *       404:
  *         description: Agente não encontrado
  */
-router.get('/agentes/:id', agentesController.getAgenteById)
+router.get('/:id', agentesController.getAgenteById)
 
 /**
  * @swagger
@@ -82,7 +96,7 @@ router.get('/agentes/:id', agentesController.getAgenteById)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Agente'
+ *             $ref: '#/components/schemas/AgenteInput'
  *     responses:
  *       201:
  *         description: Agente cadastrado com sucesso
@@ -93,7 +107,7 @@ router.get('/agentes/:id', agentesController.getAgenteById)
  *       400:
  *         description: Dados inválidos
  */
-router.post('/agentes', agentesController.insertAgente)
+router.post('/', agentesController.insertAgente)
 
 /**
  * @swagger
@@ -113,7 +127,7 @@ router.post('/agentes', agentesController.insertAgente)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Agente'
+ *             $ref: '#/components/schemas/AgenteInput'
  *     responses:
  *       200:
  *         description: Agente atualizado com sucesso
@@ -124,7 +138,7 @@ router.post('/agentes', agentesController.insertAgente)
  *       404:
  *         description: Agente não encontrado
  */
-router.put('/agentes/:id', agentesController.putAgente)
+router.put('/:id', agentesController.putAgente)
 
 /**
  * @swagger
@@ -144,7 +158,7 @@ router.put('/agentes/:id', agentesController.putAgente)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Agente'
+ *             $ref: '#/components/schemas/AgenteInput'
  *     responses:
  *       200:
  *         description: Agente atualizado com sucesso
@@ -155,7 +169,7 @@ router.put('/agentes/:id', agentesController.putAgente)
  *       404:
  *         description: Agente não encontrado
  */
-router.patch('/agentes/:id', agentesController.patchAgente)
+router.patch('/:id', agentesController.patchAgente)
 
 /**
  * @swagger
@@ -176,6 +190,6 @@ router.patch('/agentes/:id', agentesController.patchAgente)
  *       404:
  *         description: Agente não encontrado
  */
-router.delete('/agentes/:id', agentesController.deleteAgente)
+router.delete('/:id', agentesController.deleteAgente)
 
 module.exports = router

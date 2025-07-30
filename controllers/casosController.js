@@ -1,5 +1,6 @@
 const casosRepository = require('../repositories/casosRepository')
 const agentesRepository = require('../repositories/agentesRepository')
+const { v4: uuidv4, validate: uuidValidate } = require('uuid')
 
 // GET /casos
 function getAllCasos(req, res) {
@@ -14,6 +15,12 @@ function getAllCasos(req, res) {
     }
 
     if (agente_id) {
+        if (!uuidValidate(agente_id)) {
+            return res.status(400).json({
+                error: 'Id inválido'
+            })
+        }
+
         casos = casos.filter(c => c.agente_id === agente_id)
         if (casos.length === 0) {
             return res.status(200).json({
@@ -43,6 +50,12 @@ function getCasoById(req, res) {
     const { id } = req.params
     const caso = casosRepository.getCasoById(id)
 
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
+
     if (!caso) {
         return res.status(404).json({
             erro: 'Caso não encontrado'
@@ -56,6 +69,12 @@ function getCasoById(req, res) {
 function getAgenteByCaso(req, res) {
     const { id } = req.params
     const casoExists = casosRepository.getCasoById(id)
+
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
 
     if (!casoExists) {
         return res.status(404).json({
@@ -96,11 +115,11 @@ function searchInCaso(req, res) {
 
 // POST /casos
 function insertCaso(req, res) {
-    const { id, titulo, descricao, status, agente_id } = req.body
+    const { titulo, descricao, status, agente_id } = req.body
 
-    if (!id || !titulo || !descricao || !status || !agente_id) {
+    if (!titulo || !descricao || !status || !agente_id) {
         return res.status(400).json({
-            erro: 'Todos os dados são obrigatórios: id, titulo, descricao, status, agente_id'
+            erro: 'Todos os dados são obrigatórios: titulo, descricao, status, agente_id'
         })
     }
 
@@ -117,7 +136,7 @@ function insertCaso(req, res) {
     }
 
     const caso = {
-        id,
+        id: uuidv4(), // Gera automaticamente um UUID único
         titulo,
         descricao,
         status,
@@ -132,6 +151,12 @@ function insertCaso(req, res) {
 function putCaso(req, res) {
     const { id } = req.params
     const { titulo, descricao, status, agente_id } = req.body
+
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
 
     const casoExists = casosRepository.getCasoById(id)
     if (!casoExists) {
@@ -174,6 +199,12 @@ function patchCaso(req, res) {
     const { id } = req.params
     const updateData = req.body
 
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
+
     const casoExists = casosRepository.getCasoById(id)
     if (!casoExists) {
         return res.status(404).json({
@@ -211,6 +242,12 @@ function patchCaso(req, res) {
 // DELETE /casos/:id
 function deleteCaso(req, res) {
     const { id } = req.params
+
+    if (!uuidValidate(id)) {
+        return res.status(400).json({
+            error: 'Id inválido'
+        })
+    }
 
     const casoExists = casosRepository.getCasoById(id)
     if (!casoExists) {

@@ -10,8 +10,8 @@ app.use(express.json())
 // Configurar Swagger
 setupSwagger(app)
 
-app.use(agentesRouter)
-app.use(casosRouter)
+app.use('/agentes' ,agentesRouter)
+app.use('/casos', casosRouter)
 app.use((req, res) => {
     res.status(404).json({
         erro: 'Página não encontrada.'

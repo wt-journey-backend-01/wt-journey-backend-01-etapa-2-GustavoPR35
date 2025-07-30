@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const casosController = require('../controllers/casosControllers')
+const casosController = require('../controllers/casosController')
 
 /**
  * @swagger
@@ -20,6 +20,8 @@ const casosController = require('../controllers/casosControllers')
  *          properties:
  *              id:
  *                  type: string
+ *                  readOnly: true
+ *                  description: ID único gerado automaticamente
  *              titulo:
  *                  type: string
  *              descricao:
@@ -29,7 +31,23 @@ const casosController = require('../controllers/casosControllers')
  *                  enum: [aberto, solucionado]
  *              agente_id:
  *                  type: string
- * 
+ *      CasoInput:
+ *          type: object
+ *          required:
+ *              - titulo
+ *              - descricao
+ *              - status
+ *              - agente_id
+ *          properties:
+ *              titulo:
+ *                  type: string
+ *              descricao:
+ *                  type: string
+ *              status:
+ *                  type: string
+ *                  enum: [aberto, solucionado]
+ *              agente_id:
+ *                  type: string
  */
 
 /**
@@ -48,7 +66,7 @@ const casosController = require('../controllers/casosControllers')
  *                  items:
  *                    $ref: '#/components/schemas/Caso'
  */
-router.get('/casos', casosController.getAllCasos)
+router.get('/', casosController.getAllCasos)
 
 /**
  * @swagger
@@ -73,7 +91,7 @@ router.get('/casos', casosController.getAllCasos)
  *                    $ref: '#/components/schemas/Caso'
  *              
  */
-router.get('/casos/search', casosController.searchInCaso)
+router.get('/search', casosController.searchInCaso)
 
 /**
  * @swagger
@@ -98,7 +116,7 @@ router.get('/casos/search', casosController.searchInCaso)
  *       404:
  *         description: Caso não encontrado
  */
-router.get('/casos/:id', casosController.getCasoById)
+router.get('/:id', casosController.getCasoById)
 
 /**
  * @swagger
@@ -123,7 +141,7 @@ router.get('/casos/:id', casosController.getCasoById)
  *       404:
  *         description: Caso ou agente não encontrado
  */
-router.get('/casos/:id/agente', casosController.getAgenteByCaso)
+router.get('/:id/agente', casosController.getAgenteByCaso)
 
 /**
  * @swagger
@@ -136,7 +154,7 @@ router.get('/casos/:id/agente', casosController.getAgenteByCaso)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Caso'
+ *             $ref: '#/components/schemas/CasoInput'
  *     responses:
  *       201:
  *         description: Caso cadastrado com sucesso
@@ -147,7 +165,7 @@ router.get('/casos/:id/agente', casosController.getAgenteByCaso)
  *       400:
  *         description: Dados inválidos
  */
-router.post('/casos', casosController.insertCaso)
+router.post('/', casosController.insertCaso)
 
 /**
  * @swagger
@@ -167,7 +185,7 @@ router.post('/casos', casosController.insertCaso)
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Caso'
+ *             $ref: '#/components/schemas/CasoInput'
  *     responses:
  *       200:
  *         description: Caso atualizado com sucesso
@@ -178,7 +196,7 @@ router.post('/casos', casosController.insertCaso)
  *       404:
  *         description: Caso não encontrado
  */
-router.put('/casos/:id', casosController.putCaso)
+router.put('/:id', casosController.putCaso)
 
 /**
  * @swagger
@@ -198,16 +216,7 @@ router.put('/casos/:id', casosController.putCaso)
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               titulo:
- *                 type: string
- *               descricao:
- *                 type: string
- *               agenteId:
- *                 type: integer
- *               status:
- *                 type: string
+ *             $ref: '#/components/schemas/CasoInput'
  *     responses:
  *       200:
  *         description: Caso atualizado com sucesso
@@ -218,7 +227,7 @@ router.put('/casos/:id', casosController.putCaso)
  *       404:
  *         description: Caso não encontrado
  */
-router.patch('/casos/:id', casosController.patchCaso)
+router.patch('/:id', casosController.patchCaso)
 
 /**
  * @swagger
@@ -239,6 +248,6 @@ router.patch('/casos/:id', casosController.patchCaso)
  *       404:
  *         description: Caso não encontrado
  */
-router.delete('/casos/:id', casosController.deleteCaso)
+router.delete('/:id', casosController.deleteCaso)
 
 module.exports = router
