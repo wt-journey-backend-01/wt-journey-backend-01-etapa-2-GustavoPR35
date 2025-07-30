@@ -1,213 +1,223 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 8 créditos restantes para usar o sistema de feedback AI.
+Você tem 7 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para GustavoPR35:
 
-Nota final: **75.3/100**
+Nota final: **81.9/100**
 
-# Feedback para GustavoPR35 🚓✨
+Olá, GustavoPR35! 👋🚀
 
-Olá, Gustavo! Que jornada incrível você fez até aqui na construção dessa API para o Departamento de Polícia! 🚀 Antes de entrarmos nos detalhes, quero destacar que você estruturou seu projeto de forma muito organizada, separando bem as responsabilidades entre rotas, controllers e repositories — isso é fundamental para manter o código limpo e escalável. Parabéns por isso! 👏
-
-Além disso, você implementou muito bem os endpoints básicos para agentes e casos, com os métodos HTTP principais funcionando corretamente. Vi também que você conseguiu aplicar filtros simples e ordenação para os agentes e casos, o que é um bônus importante e mostra que você está pensando além do básico. 🎉
+Primeiramente, parabéns pelo esforço e pela entrega dessa API para o Departamento de Polícia! 🎉 Você fez um trabalho muito sólido, especialmente no que diz respeito à implementação dos endpoints básicos para agentes e casos, e também mandou bem nos bônus como filtros simples e ordenação. Isso mostra que você está indo além do básico e buscando entregar uma API mais robusta e funcional — muito legal! 👏
 
 ---
 
-## Vamos analisar juntos os pontos que podem ser aprimorados para deixar sua API ainda mais robusta e alinhada com as melhores práticas!
+## 🎯 O que está muito bom e merece destaque
+
+- Seus endpoints para `/agentes` estão completos, com todos os métodos HTTP implementados (GET, POST, PUT, PATCH, DELETE) e com validações bem cuidadosas, como a checagem do formato da data e do UUID.  
+- A organização do código está excelente: você separou bem as rotas, controllers e repositories, respeitando a arquitetura modular.  
+- O uso do `uuid` para gerar e validar IDs está correto e consistente.  
+- Implementou filtros e ordenação para agentes (`cargo`, `dataDeIncorporacao`), e filtros para casos (`status`, `agente_id`), o que já é um diferencial.  
+- Tratamento de erros com mensagens claras e status HTTP apropriados está presente na maior parte do código.  
+- Bônus que você acertou:  
+  - Filtro por status e agente nos casos.  
+  - Busca simples por palavras-chave no título e descrição dos casos (embora com alguns pontos a melhorar, veremos a seguir).  
+  - Ordenação por data de incorporação dos agentes (embora com algumas falhas, que também comentarei).  
 
 ---
 
-### 1. **Validação da Data de Incorporação do Agente**
+## 🕵️‍♂️ Pontos de atenção para evoluir seu código
 
-Percebi que você valida a presença do campo `dataDeIncorporacao` no payload, mas não valida o formato da data nem se ela está no passado. Isso fez com que fosse possível registrar agentes com datas inválidas ou futuras, o que pode comprometer a integridade dos dados.
+### 1. Validação e tratamento de IDs no PUT (alteração indevida do campo `id`)
 
-No seu `agentesController.js`, na função `insertAgente`, você tem:
+Eu percebi que nos seus métodos PUT para agentes e casos, você não está protegendo o campo `id` contra alterações. Isso é um problema porque a API não deve permitir que o cliente altere o identificador único de um recurso.  
+
+No seu `putAgente`, por exemplo, você aceita o `id` pela URL e no corpo espera os outros campos, mas não impede que o campo `id` no corpo seja diferente ou alterado. Isso pode causar inconsistências. O mesmo acontece no `putCaso`.
+
+**Trecho do seu código atual (exemplo do agente):**
 
 ```js
-if (!nome || !dataDeIncorporacao || !cargo) {
-    return res.status(400).json({
-        erro: 'Todos os dados são obrigatórios: nome, dataDeIncorporacao, cargo'
-    })
+// PUT /agentes/:id
+function putAgente(req, res) {
+    const { id } = req.params
+    const { nome, dataDeIncorporacao, cargo } = req.body
+    // ... validações ...
+    const agenteUpdate = {
+        id,
+        nome,
+        dataDeIncorporacao,
+        cargo
+    }
+    agentesRepository.updateAgente(agenteUpdate)
+    res.status(200).json(agenteUpdate)
 }
 ```
 
-Mas não há validação para o formato ou para a data futura. Para resolver isso, você pode usar uma verificação simples com regex para o formato esperado (ex: `YYYY-MM-DD`) e comparar com a data atual para garantir que não seja futura. Exemplo:
+Aqui você está assumindo que o ID do body não será enviado ou alterado, mas não há uma validação explícita para impedir isso.
+
+**Sugestão para corrigir:**
+
+- No PUT, ignore o campo `id` enviado no corpo, ou retorne erro se o `id` do corpo estiver presente e for diferente do da URL.  
+- Isso evita que o cliente tente mudar o ID do recurso.
+
+Exemplo de validação extra:
 
 ```js
-const dataRegex = /^\d{4}-\d{2}-\d{2}$/
-if (!dataRegex.test(dataDeIncorporacao)) {
-    return res.status(400).json({ erro: 'dataDeIncorporacao deve estar no formato YYYY-MM-DD' })
-}
-const dataIncorp = new Date(dataDeIncorporacao)
-const hoje = new Date()
-if (dataIncorp > hoje) {
-    return res.status(400).json({ erro: 'dataDeIncorporacao não pode ser uma data futura' })
-}
-```
-
-Essa validação também deve ser aplicada nas rotas de atualização (`putAgente` e `patchAgente`).
-
-**Recomendo muito que você veja este vídeo sobre validação de dados em APIs Node.js/Express:**  
-[yNDCRAz7CM8](https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_)
-
----
-
-### 2. **Proteção do Campo `id` nas Atualizações**
-
-Notei que, nas funções de atualização (`putAgente`, `patchAgente`, e também em `putCaso`), não há proteção para impedir que o campo `id` seja alterado via payload. Isso pode causar inconsistências graves, pois o `id` deve ser imutável — é a identidade única do recurso.
-
-Por exemplo, em `patchAgente`:
-
-```js
-const agenteUpdate = {
-    ...agenteExists,
-    ...updateData,
-    id: id
-}
-```
-
-Aqui você está sobrescrevendo o `id` com o valor correto, o que é bom, mas não impede que o usuário envie um `id` diferente no corpo da requisição. O ideal é validar e rejeitar se o corpo da requisição tentar alterar o `id`. Algo assim:
-
-```js
-if (updateData.id && updateData.id !== id) {
+if (req.body.id && req.body.id !== id) {
     return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
 }
 ```
 
-Faça essa validação em todas as rotas de atualização para agentes e casos.
+**Recomendo conferir este vídeo para entender melhor validação e tratamento de erros na API:**  
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400
 
 ---
 
-### 3. **Endpoint `/casos/:id/agente` com Resposta Incorreta**
+### 2. Validação dos IDs inválidos para casos e agentes (status 404 e 400)
 
-Você implementou o endpoint `/casos/:id/agente` para retornar o agente responsável por um caso, mas percebi um pequeno erro de digitação no seu Swagger e possivelmente na resposta:
+No seu controller de casos, no método `getCasoById`, você faz a validação do UUID antes de buscar o caso, o que é ótimo:
 
 ```js
-res.status(200).json(agente)
+if (!uuidValidate(id)) {
+    return res.status(400).json({
+        erro: 'Id inválido'
+    })
+}
 ```
 
-No Swagger, você escreveu:
+Porém, em alguns outros métodos, como `getAgenteByCaso` (que busca o agente responsável por um caso pelo ID do caso), você não está validando se o agente retornado existe antes de enviar a resposta. Isso pode causar que você retorne um objeto `undefined` ou `null` com status 200, o que não é correto.
 
-```yaml
-content:
-  aplication/json:
-```
-
-Note que o correto é `application/json`. Esse erro pode causar problemas em ferramentas que consomem sua documentação.
-
-Além disso, no controller, você retorna o agente diretamente sem verificar se o agente foi encontrado:
+**Exemplo:**
 
 ```js
 const agente = agentesRepository.getAgenteById(casoExists.agente_id)
 res.status(200).json(agente)
 ```
 
-Se o agente não existir (por algum motivo), o ideal é retornar um 404 com uma mensagem clara:
+Aqui falta verificar se `agente` existe, caso contrário deveria retornar um 404 com erro.
+
+**Melhoria:**
 
 ```js
 if (!agente) {
     return res.status(404).json({ erro: 'Agente não encontrado' })
 }
+res.status(200).json(agente)
 ```
 
-Isso evita que a API retorne `null` ou dados inconsistentes.
+Esse cuidado é importante para manter a consistência e evitar respostas vazias ou confusas.
 
 ---
 
-### 4. **Filtros e Ordenação no Endpoint de Agentes**
+### 3. Endpoint de busca (`/casos/search`) e filtro de agentes por data de incorporação com ordenação
 
-Você implementou muito bem os filtros por `cargo` e ordenação por `dataDeIncorporacao` no `getAllAgentes`. Porém, para o filtro de `cargo`, você faz uma comparação case-insensitive, o que é ótimo, mas para o sort, você usa:
+Você implementou o endpoint `/casos/search` para filtrar casos por palavras-chave no título e descrição, o que é muito bom! Porém, notei que o teste de busca falhou, indicando que talvez a implementação precise de ajustes.
+
+Ao analisar seu código:
 
 ```js
-if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
-    const crescente = sort === 'dataDeIncorporacao'
-    agentes.sort((a, b) => {
-        const dateA = new Date(a.dataDeIncorporacao)
-        const dateB = new Date(b.dataDeIncorporacao)
-        return crescente ? dateA - dateB : dateB - dateA
-    })
+function searchInCaso(req, res) {
+    const { q } = req.query
+    
+    if (!q || q.trim() === '') {
+        return res.status(400).json({
+            erro: 'Termo de busca "q" é obrigatório.'
+        })
+    }
+    
+    const searchQuery = q.toLowerCase().trim()
+    let casos = casosRepository.getAll()
+
+    casos = casos.filter(c => 
+        c.titulo.toLowerCase().includes(searchQuery) || 
+        c.descricao.toLowerCase().includes(searchQuery)
+    )
+    
+    if (casos.length === 0) {
+        return res.status(200).json({
+            mensagem: 'Nenhum caso encontrado pela pesquisa.'
+        })
+    }
+
+    res.status(200).json(casos)
 }
 ```
 
-Isso está perfeito! Só fique atento para garantir que a data esteja sempre em formato válido para evitar erros na ordenação (veja o ponto 1 sobre validação de datas).
+A lógica parece correta, mas pode haver detalhes no teste que esperam um formato ou comportamento específico (como status code ou estrutura do JSON). Verifique se o endpoint está de fato sendo chamado corretamente, e se o corpo da resposta está conforme o esperado.
 
----
-
-### 5. **Mensagens de Erro Personalizadas para IDs Inválidos**
-
-Notei que em vários pontos, como no `getAgenteById` e `getCasoById`, você retorna um JSON com a chave `error` para erros de ID inválido, mas em outros usa `erro`. Por exemplo:
+Além disso, o filtro e ordenação por `dataDeIncorporacao` nos agentes (com sort asc e desc) está implementado, mas os testes indicam que há falhas. Isso pode estar relacionado à forma como você está comparando datas:
 
 ```js
-if (!uuidValidate(id)) {
-    return res.status(400).json({
-        error: 'Id inválido'
-    })
-}
-```
-
-Mas em outros lugares:
-
-```js
-return res.status(400).json({
-    erro: 'Todos os dados são obrigatórios: nome, dataDeIncorporacao, cargo'
+agentes.sort((a, b) => {
+    const dateA = new Date(a.dataDeIncorporacao)
+    const dateB = new Date(b.dataDeIncorporacao)
+    return crescente ? dateA - dateB : dateB - dateA
 })
 ```
 
-Essa inconsistência pode confundir quem consome sua API. O ideal é padronizar o formato da resposta de erro, por exemplo, sempre usar `erro` ou sempre usar `error`. Além disso, use mensagens claras e consistentes para facilitar o entendimento do cliente da API.
+Embora essa lógica funcione para datas, o ideal é garantir que as datas estejam em formato ISO e que a comparação seja robusta. Além disso, certifique-se de que o parâmetro `sort` está sendo passado corretamente e que o filtro por `cargo` não interfere.
 
 ---
 
-### 6. **Arquitetura e Organização do Projeto**
+### 4. Mensagens de erro customizadas e status HTTP coerentes
 
-Sua estrutura de diretórios está muito bem organizada e segue o padrão esperado para o desafio:
+Você fez um bom trabalho com mensagens claras, mas alguns testes bônus falharam indicando que as mensagens personalizadas para erros de argumentos inválidos não estão 100% conforme esperado. Vale a pena revisar todos os retornos de erro para garantir que:
 
-```
-.
-├── controllers/
-├── repositories/
-├── routes/
-├── docs/
-├── server.js
-├── package.json
-```
-
-Tudo nos conformes! Isso facilita muito a manutenção e escalabilidade do projeto. 👍
+- O status 400 é usado para dados mal formatados ou inválidos (ex: UUID inválido, payload com campos faltando ou incorretos).  
+- O status 404 é usado para recursos não encontrados (ex: agente ou caso inexistente).  
+- As mensagens de erro são informativas e seguem um padrão consistente (ex: `{ erro: 'Mensagem clara' }`).
 
 ---
 
-## Recursos para Você Aprimorar Ainda Mais! 📚
+### 5. Penalidades detectadas: alteração do ID via PUT
 
-- **Validação de dados em APIs Node.js/Express:**  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
+Conforme já comentei no primeiro ponto, a possibilidade de alterar o `id` dos agentes e casos via PUT é um problema grave. Isso pode comprometer a integridade dos dados e a confiabilidade da API.
 
-- **Documentação e roteamento no Express.js:**  
-  https://expressjs.com/pt-br/guide/routing.html
-
-- **Manipulação de arrays no JavaScript:**  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
-
-- **HTTP Status Codes (400 e 404):**  
-  - 400 Bad Request: https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
-  - 404 Not Found: https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404
+É fundamental que você implemente uma validação para bloquear essa alteração, seja ignorando o campo `id` no corpo ou retornando erro (preferível).
 
 ---
 
-## Resumo Rápido para Você Focar:
+## 🗂️ Sobre a estrutura do projeto
 
-- ✅ **Validar o formato e a data do campo `dataDeIncorporacao`** para evitar valores inválidos ou futuros.  
-- ✅ **Impedir alterações no campo `id` nas rotas de atualização (PUT/PATCH)**, retornando erro 400 se tentarem alterar.  
-- ✅ **Corrigir o typo em `application/json` na documentação Swagger** para o endpoint `/casos/:id/agente` e validar se o agente existe antes de retornar.  
-- ✅ **Padronizar as mensagens de erro e a chave usada (`erro` ou `error`)** para manter consistência na API.  
-- ✅ **Manter a organização atual do projeto**, que já está muito boa!  
+Sua estrutura está bem organizada e segue o esperado, com pastas separadas para `routes`, `controllers`, `repositories` e `docs`. Isso facilita a manutenção e escalabilidade do projeto. 👍
+
+Uma sugestão para o futuro é criar uma pasta `utils` para funções auxiliares, como um middleware para tratamento centralizado de erros, por exemplo, mas isso é apenas um extra.
 
 ---
 
-Gustavo, você está no caminho certo e já construiu uma base sólida para sua API! Com esses ajustes, ela ficará ainda mais profissional, segura e alinhada com as boas práticas do desenvolvimento backend. Continue explorando, validando e testando suas APIs — isso vai te deixar cada vez mais afiado! ⚡
+## 📚 Recomendações de estudos para você
 
-Se precisar de ajuda para implementar as validações ou qualquer outra coisa, estou aqui para te apoiar! Vamos juntos nessa jornada! 💪🚓
+- Para entender melhor como validar e proteger campos em endpoints PUT e PATCH:  
+  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
+  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
 
-Um abraço e até a próxima revisão! 👊😄
+- Para aprofundar em roteamento e organização da API com Express.js:  
+  https://expressjs.com/pt-br/guide/routing.html  
+  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH  
+
+- Para manipulação de arrays e filtros em JavaScript (útil para buscas e ordenações):  
+  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI  
+
+- Para entender status HTTP e boas práticas na construção de APIs REST:  
+  https://youtu.be/RSZHvQomeKE  
+
+---
+
+## 📝 Resumo rápido para focar na próxima etapa
+
+- ✅ Bloquear alteração do campo `id` nos métodos PUT (e verificar também no PATCH).  
+- ✅ Garantir que o endpoint `/casos/search` esteja retornando o resultado esperado e com status correto.  
+- ✅ Validar existência do agente em `/casos/:id/agente` antes de retornar, evitando respostas vazias.  
+- ✅ Revisar mensagens de erro para garantir consistência e que os status HTTP estejam adequados (400 para dados inválidos, 404 para não encontrados).  
+- ✅ Ajustar a ordenação por `dataDeIncorporacao` para garantir que funcione corretamente nos filtros dos agentes.  
+
+---
+
+Gustavo, você está no caminho certo! Seu código já tem uma base muito boa e está bem estruturado. Com esses ajustes, sua API vai ficar ainda mais sólida e profissional. Continue explorando, testando e aprimorando, pois a prática leva à perfeição! 🚀✨
+
+Se precisar, volte e revise os vídeos e a documentação que indiquei — eles vão te dar uma base ainda mais firme para esses detalhes. Estou aqui torcendo pelo seu sucesso! 👊💪
+
+Um abraço e até a próxima! 🤖💙
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
