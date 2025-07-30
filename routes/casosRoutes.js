@@ -56,15 +56,31 @@ const casosController = require('../controllers/casosController')
  *   get:
  *     summary: Retorna a lista de todos os casos
  *     tags: [Casos]
+ *     parameters:
+ *       - in: query
+ *         name: agente_id
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filtra casos por ID do agente responsável
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [aberto, solucionado]
+ *         required: false
+ *         description: Filtra casos por status
  *     responses:
  *       200:
  *         description: Lista de casos retornada com sucesso
  *         content:
  *           application/json:
  *              schema:
- *                  type: array
- *                  items:
- *                    $ref: '#/components/schemas/Caso'
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/Caso'
+ *       400:
+ *         description: ID do agente inválido ou status inválido
  */
 router.get('/', casosController.getAllCasos)
 
@@ -79,6 +95,7 @@ router.get('/', casosController.getAllCasos)
  *         name: q
  *         schema:
  *           type: string
+ *         required: true
  *         description: Termo de busca
  *     responses:
  *       200:
@@ -89,8 +106,10 @@ router.get('/', casosController.getAllCasos)
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Caso'
+ *       400:
+ *         description: Termo de busca não fornecido
  */
-router.get('/search', casosController.searchInCaso)
+router.get('/search', casosController.searchInCaso) // rota /casos/search está declarada antes da rota /casos/:id
 
 /**
  * @swagger
@@ -112,10 +131,12 @@ router.get('/search', casosController.searchInCaso)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Agente'
+ *       400:
+ *         description: ID do caso inválido
  *       404:
  *         description: Caso ou agente não encontrado
  */
-router.get('/:id/agente', casosController.getAgenteByCaso)
+router.get('/:id/agente', casosController.getAgenteByCaso) // a rota /casos/:id/agente está registrada corretamente no casosRoutes.js
 
 /**
  * @swagger

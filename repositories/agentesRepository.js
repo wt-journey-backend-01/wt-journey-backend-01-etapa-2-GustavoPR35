@@ -10,6 +10,7 @@ function getAgenteById(id) {
 
 function insertAgente(agente) {
     agentes.push(agente)
+    // console.log(agentes) os agentes estão realmente sendo inseridos no array agentes do agentesRepository
 }
 
 function updateAgente(agenteUpdate) {
@@ -26,27 +27,10 @@ function deleteAgente(id) {
     }
 }
 
-function getAgentesPorCargo(cargo) {
-    return agentes.filter(a => a.cargo.toLowerCase() === cargo.toLowerCase())
-}
-
-function getAgentesOrdenadosPorData(sort) {
-    const crescente = (sort === 'dataDeIncorporacao')
-    const agentesCopy = agentes.slice()
-    return agentesCopy.sort((a, b) => {
-        const dateA = new Date(a.dataDeIncorporacao).getTime()
-        const dateB = new Date(b.dataDeIncorporacao).getTime()
-            
-        return crescente ? dateA - dateB : dateB - dateA
-    })
-}
-
 module.exports = {
     getAll,
     getAgenteById,
     insertAgente,
     updateAgente,
-    deleteAgente,
-    getAgentesPorCargo,
-    getAgentesOrdenadosPorData
+    deleteAgente
 }

@@ -47,6 +47,20 @@ const agentesController = require('../controllers/agentesController')
  *   get:
  *     summary: Retorna a lista de todos os agentes
  *     tags: [Agentes]
+ *     parameters:
+ *       - in: query
+ *         name: cargo
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Filtra agentes por cargo (ex. delegado, inspetor)
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [dataDeIncorporacao, -dataDeIncorporacao]
+ *         required: false
+ *         description: Ordena agentes por data de incorporação (crescente ou decrescente)
  *     responses:
  *       200:
  *         description: Lista de agentes retornada com sucesso
@@ -56,6 +70,8 @@ const agentesController = require('../controllers/agentesController')
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Agente'
+ *       400:
+ *         description: Parâmetros inválidos
  */
 router.get('/', agentesController.getAllAgentes)
 

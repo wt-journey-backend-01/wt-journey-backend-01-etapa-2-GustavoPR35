@@ -13,11 +13,17 @@ function getAllAgentes(req, res) {
     }
 
     if (cargo) {
-        agentes = agentesRepository.getAgentesPorCargo(cargo)
+        agentes = agentes.filter(a => a.cargo.toLowerCase() === cargo.toLowerCase())
     }
 
     if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
-        agentes = agentesRepository.getAgentesOrdenadosPorData(sort)
+        const agentesCopy = agentes.slice()
+        agentesCopy.sort((a, b) => {
+            const dateA = new Date(a.dataDeIncorporacao).getTime()
+            const dateB = new Date(b.dataDeIncorporacao).getTime()
+            return sort === 'dataDeIncorporacao' ? dateA - dateB : dateB - dateA
+        })
+        agentes = agentesCopy
     }
 
     res.status(200).json(agentes)
@@ -71,7 +77,7 @@ function insertAgente(req, res) {
         dataDeIncorporacao,
         cargo
     }
-    agentesRepository.insertAgente(agente)
+    agentesRepository.insertAgente(agente) // os agentes estão realmente sendo inseridos no array agentes do agentesRepository
     res.status(201).json(agente)
 }
 

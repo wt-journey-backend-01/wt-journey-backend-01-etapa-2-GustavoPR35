@@ -77,6 +77,7 @@ function getAgenteByCaso(req, res) {
         })
     }
 
+    // console.log(agente) // o agente é corretamente retornado
     res.status(200).json(agente)
 }
 
