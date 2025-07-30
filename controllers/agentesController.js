@@ -13,7 +13,6 @@ function getAllAgentes(req, res) {
     }
 
     if (cargo) {
-        console.log("filtrando...")
         agentes = agentes.filter(a => a.cargo && a.cargo.toLowerCase() === cargo.toLowerCase())
         
         if (agentes.length === 0) {
@@ -22,7 +21,6 @@ function getAllAgentes(req, res) {
     }
 
     if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
-        console.log("ordenando...")
         const crescente = (sort === 'dataDeIncorporacao')
         
         agentes.sort((a, b) => {
@@ -43,7 +41,7 @@ function getAgenteById(req, res) {
     // Validar UUID primeiro
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do agente inválido'
+            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -100,7 +98,7 @@ function putAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do agente inválido'
+            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -144,7 +142,7 @@ function patchAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do agente inválido'
+            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -192,7 +190,7 @@ function deleteAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do agente inválido'
+            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 

@@ -85,11 +85,10 @@ router.get('/', casosController.getAllCasos)
  *         description: Resultados da busca
  *         content:
  *           application/json:
- *              schema:
- *                  type: array
- *                  items:
- *                    $ref: '#/components/schemas/Caso'
- *              
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Caso'
  */
 router.get('/search', casosController.searchInCaso)
 
@@ -110,9 +109,9 @@ router.get('/search', casosController.searchInCaso)
  *       200:
  *         description: Agente responsável pelo caso
  *         content:
- *          application/json:
- *              schema:
- *                  $ref: '#/components/schemas/Agente'
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Agente'
  *       404:
  *         description: Caso ou agente não encontrado
  */

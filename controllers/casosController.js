@@ -11,15 +11,13 @@ function getAllCasos(req, res) {
     if (agente_id) {
         if (!uuidValidate(agente_id)) {
             return res.status(400).json({
-                erro: 'ID do caso inválido'
+                erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
             })
         }
 
         casos = casos.filter(c => c.agente_id === agente_id)
         if (casos.length === 0) {
-            return res.status(200).json({
-                mensagem: 'Nenhum caso com o agente especificado encontrado.'
-            })
+            return res.status(200).json([])
         }
     }
 
@@ -30,9 +28,7 @@ function getAllCasos(req, res) {
     } else if (status) {
         casos = casos.filter(c => c.status === status)
         if (casos.length === 0) {
-            return res.status(200).json({
-                mensagem: `Nenhum caso ${status} encontrado.`
-            })
+            return res.status(200).json([])
         }
     }
 
@@ -46,7 +42,7 @@ function getCasoById(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do caso inválido'
+            erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -65,7 +61,7 @@ function getAgenteByCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do caso inválido'
+            erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -158,7 +154,7 @@ function putCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do caso inválido'
+            erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -205,7 +201,7 @@ function patchCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do caso inválido'
+            erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -253,7 +249,7 @@ function deleteCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'ID do caso inválido'
+            erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 

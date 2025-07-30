@@ -5,8 +5,8 @@ const agentesController = require('../controllers/agentesController')
 /**
  * @swagger
  * tags:
- *  name: Agentes
- *  description: Gerenciamento de agentes
+ *   name: Agentes
+ *   description: Gerenciamento de agentes
  * components:
  *   schemas:
  *     Agente:
@@ -39,7 +39,6 @@ const agentesController = require('../controllers/agentesController')
  *           type: string
  *         cargo:
  *           type: string
- * 
  */
 
 /**
