@@ -135,7 +135,7 @@ router.get('/:id', casosController.getCasoById)
  *       200:
  *         description: Agente responsável pelo caso
  *         content:
- *          aplication/json:
+ *          application/json:
  *              schema:
  *                  $ref: '#/components/schemas/Agente'
  *       404:

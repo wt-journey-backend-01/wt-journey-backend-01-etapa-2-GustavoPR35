@@ -17,7 +17,7 @@ function getAllCasos(req, res) {
     if (agente_id) {
         if (!uuidValidate(agente_id)) {
             return res.status(400).json({
-                error: 'Id inválido'
+                erro: 'Id inválido'
             })
         }
 
@@ -52,7 +52,7 @@ function getCasoById(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            error: 'Id inválido'
+            erro: 'Id inválido'
         })
     }
 
@@ -72,7 +72,7 @@ function getAgenteByCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            error: 'Id inválido'
+            erro: 'Id inválido'
         })
     }
 
@@ -154,7 +154,7 @@ function putCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            error: 'Id inválido'
+            erro: 'Id inválido'
         })
     }
 
@@ -201,8 +201,12 @@ function patchCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            error: 'Id inválido'
+            erro: 'Id inválido'
         })
+    }
+
+    if (updateData.id && updateData.id !== id) {
+        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
     }
 
     const casoExists = casosRepository.getCasoById(id)
@@ -245,7 +249,7 @@ function deleteCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            error: 'Id inválido'
+            erro: 'Id inválido'
         })
     }
 
