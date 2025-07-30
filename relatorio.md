@@ -1,87 +1,84 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 2 créditos restantes para usar o sistema de feedback AI.
+Você tem 1 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para GustavoPR35:
 
 Nota final: **86.2/100**
 
-Olá GustavoPR35! 👋🚀
+# Feedback para GustavoPR35 🚨👮‍♂️
 
-Antes de mais nada, parabéns pelo esforço e pela entrega do seu projeto da API para o Departamento de Polícia! 🎉 Você fez um trabalho muito sólido, especialmente na implementação dos recursos básicos para agentes e casos, além de ter estruturado seu projeto de forma clara e organizada. Isso é fundamental para o sucesso de qualquer API RESTful! Vamos juntos analisar seu código para tirar o máximo de aprendizado dessa jornada. 😉
-
----
-
-## 🎯 Pontos Fortes que Merecem Destaque
-
-1. **Arquitetura Modular Bem Organizada:**  
-   Seu projeto está muito bem estruturado com rotas, controllers e repositories separados, exatamente como esperado! Por exemplo, você tem:
-
-   ```js
-   app.use('/agentes', agentesRouter)
-   app.use('/casos', casosRouter)
-   ```
-
-   E os arquivos estão organizados assim:
-
-   ```
-   ├── routes/
-   ├── controllers/
-   ├── repositories/
-   └── docs/
-   ```
-
-   Isso mostra que você entende a importância da organização para manter o código escalável e fácil de manter.
-
-2. **Implementação Completa dos Endpoints Obrigatórios:**  
-   Você implementou todos os métodos HTTP (GET, POST, PUT, PATCH, DELETE) para `/agentes` e `/casos`, com as validações básicas, tratamento de erros e status codes corretos. Por exemplo, no `agentesController.js`, a validação do UUID e o retorno 404 estão muito bem feitos:
-
-   ```js
-   if (!uuidValidate(id)) {
-       return res.status(400).json({
-           erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
-       })
-   }
-   ```
-
-3. **Manipulação Correta dos Dados em Memória:**  
-   Os arrays `agentes` e `casos` em seus respectivos repositories estão sendo manipulados corretamente com métodos como `push`, `find`, `filter`, `splice` e `findIndex`. Isso é essencial para garantir que a API funcione sem banco de dados.
-
-4. **Bônus Conquistados com Mérito:**  
-   Você implementou filtros simples para casos por status e agente, e também filtragem de agentes por data de incorporação com ordenação crescente e decrescente. Isso é um diferencial e mostra que você foi além do básico. Parabéns! 👏
+Olá, Gustavo! Que jornada incrível você está fazendo no desafio da API para o Departamento de Polícia! 🚀 Antes de mais nada, parabéns pelo empenho e pela qualidade do seu código. 🎉
 
 ---
 
-## 🔍 Oportunidades de Aprimoramento e Análise Profunda
+## 🎉 Pontos Fortes que Merecem Aplausos
 
-### 1. Endpoint `/casos/:id/agente` — Busca do Agente Responsável pelo Caso
+- Você implementou com sucesso todos os métodos HTTP essenciais para os recursos `/agentes` e `/casos`. Isso é fundamental e você conseguiu entregar muito bem! 👏
+- A arquitetura modular está muito bem feita: separou rotas, controllers e repositories de forma clara e organizada. Isso facilita muito a manutenção e evolução do projeto.
+- O uso do `uuid` para identificação única está correto e bem aplicado.
+- As validações de UUID e dos dados obrigatórios estão bem implementadas, com mensagens de erro claras e status codes apropriados.
+- A manipulação dos arrays em memória está correta, usando métodos como `find`, `filter`, `push` e `splice` de forma adequada.
+- Você também entregou várias funcionalidades bônus, como:
+  - Filtragem de casos por status e agente.
+  - Filtros de agentes por data de incorporação com ordenação crescente e decrescente (embora com alguns ajustes, que vamos falar).
+  - Implementou mensagens de erro customizadas para argumentos inválidos.
+  
+Esses extras mostram que você foi além do básico e isso é muito valioso! 👏👏👏
 
-Você implementou a rota corretamente no `casosRoutes.js`:
+---
+
+## 🔎 Pontos de Atenção e Como Melhorar (Vamos Detalhar!)
+
+### 1. Endpoint para buscar o agente responsável por um caso (`GET /casos/:id/agente`)
+
+**O que eu vi:**  
+Você declarou a rota corretamente em `routes/casosRoutes.js`:
 
 ```js
 router.get('/:id/agente', casosController.getAgenteByCaso)
 ```
 
-E no controller, a função `getAgenteByCaso` está bem estruturada e retorna o agente correto. Porém, percebi que esse recurso **não passou nos testes bônus de "Simple Filtering"** para busca do agente responsável. Isso pode indicar que, apesar de estar implementado, pode faltar algum detalhe no tratamento de erros ou no formato da resposta esperado.
+E no controller `casosController.js` a função `getAgenteByCaso` está implementada e parece correta, inclusive com validações de UUID e checagem de existência do caso e agente.
 
-**Possível causa raiz:**  
-- Verifique se o agente retornado tem todos os campos exigidos pela especificação Swagger e se o status code retornado é sempre `200` quando o agente é encontrado.  
-- Confira se o erro 400 para ID inválido e 404 para caso ou agente não encontrado estão exatamente com as mensagens personalizadas e formato JSON esperado.
+**Por que o teste falhou?**  
+O problema mais provável é que o teste espera uma mensagem de erro customizada para IDs inválidos e casos não encontrados, e talvez seu retorno de erro não esteja exatamente no formato esperado. Ou pode ser que o caso de teste esteja tentando acessar um ID que não existe e o tratamento de erro não esteja cobrindo todos os cenários com mensagens personalizadas.
 
-> Recomendo revisar o tratamento de erros personalizados para esse endpoint, garantindo que as mensagens estejam consistentes com o padrão do restante da API. Para isso, dê uma olhada neste recurso que explica como criar mensagens de erro personalizadas e status HTTP corretos:  
-> [Status 400 e 404 com mensagens personalizadas - MDN](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400)
+**Sugestão:**  
+Verifique se suas mensagens de erro estão consistentes e personalizadas, por exemplo:
+
+```js
+if (!uuidValidate(id)) {
+    return res.status(400).json({
+        erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
+    })
+}
+```
+
+E para caso não encontrado:
+
+```js
+if (!casoExists) {
+    return res.status(404).json({
+        erro: 'Caso não encontrado.'
+    })
+}
+```
+
+O mesmo vale para agente não encontrado. Isso já está no seu código, então revise se o teste espera algo mais específico e, se possível, adicione logs para conferir o fluxo.
 
 ---
 
-### 2. Endpoint de Busca `/casos/search` — Filtragem por Termos no Título e Descrição
+### 2. Endpoint de busca de casos por palavras-chave (`GET /casos/search?q=...`)
 
-Você implementou a rota:
+**O que eu vi:**  
+Você declarou a rota antes da rota `/:id` para evitar conflito, o que está correto:
 
 ```js
 router.get('/search', casosController.searchInCaso)
 ```
 
-E no controller:
+E a função no controller:
 
 ```js
 function searchInCaso(req, res) {
@@ -89,7 +86,7 @@ function searchInCaso(req, res) {
 
     if (!q || q.trim() === '') {
         return res.status(400).json({
-            erro: 'Termo de busca "q" é obrigatório.'
+            erro: 'O termo de pesquisa "q" é obrigatório.'
         })
     }
     
@@ -99,170 +96,188 @@ function searchInCaso(req, res) {
 }
 ```
 
-Isso está correto! Porém, a filtragem parece não ter passado nos testes bônus.
+**Por que o teste falhou?**  
+O problema pode estar na função `searchCasoTermo` do `casosRepository.js`. O código parece bom, mas talvez o teste esteja esperando uma busca case-insensitive mais robusta ou um tratamento de espaços extras.
 
-**Possível causa raiz:**  
-- A função `searchCasoTermo` no `casosRepository.js` está usando `.toLowerCase()` para comparar, o que é ótimo.  
-- Verifique se o endpoint está sendo chamado exatamente como `/casos/search?q=algumTermo` e se o middleware `express.json()` está ativo para processar requisições corretamente (você já fez isso no `server.js`, então está ok).  
-- Pode ser que o problema esteja na ordem das rotas: no `casosRoutes.js`, a rota `/search` está antes de `/:id`, o que está correto para evitar conflito, então isso não é o problema.  
-- Talvez o problema esteja na documentação Swagger, que pode não estar declarando o parâmetro `q` como obrigatório corretamente, o que pode impactar ferramentas de teste automáticas.
-
-> Sugiro revisar a documentação Swagger para garantir que o parâmetro `q` esteja marcado como obrigatório e com descrição clara. Para entender melhor como documentar query params no Swagger, veja:  
-> [Documentação oficial do Express.js sobre roteamento](https://expressjs.com/pt-br/guide/routing.html) e [Swagger query parameters](https://swagger.io/docs/specification/paths-and-operations/#parameters)
-
----
-
-### 3. Filtros e Ordenação em `/agentes` por `dataDeIncorporacao`
-
-Você implementou essa funcionalidade no `agentesController.js`:
+**Sugestão:**  
+Garanta que a busca seja case-insensitive (que já está) e que o parâmetro `q` seja devidamente tratado (trim e validação). Você pode melhorar assim:
 
 ```js
-if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
-    const agentesCopy = agentes.slice()
-    agentesCopy.sort((a, b) => {
-        const dateA = new Date(a.dataDeIncorporacao).getTime()
-        const dateB = new Date(b.dataDeIncorporacao).getTime()
-        return sort === 'dataDeIncorporacao' ? dateA - dateB : dateB - dateA
+function searchCasoTermo(q) {
+    const query = q.trim().toLowerCase()
+    return casos.filter(c => {
+        return c.titulo.toLowerCase().includes(query) || c.descricao.toLowerCase().includes(query)
     })
-    agentes = agentesCopy
 }
 ```
 
-Isso está muito bem feito! Porém, os testes bônus indicam que a ordenação não passou.
+Além disso, faça testes manuais para garantir que a busca funcione com diferentes casos e espaços. Isso deve destravar esse bônus! 🔍
 
-**Possível causa raiz:**  
-- Pode ser que o filtro `cargo` esteja sendo aplicado antes da ordenação, o que está correto, mas talvez o retorno final não esteja refletindo a ordenação esperada.  
-- Outra hipótese é que a validação do parâmetro `sort` não esteja cobrindo todos os casos esperados, ou que o parâmetro esteja vindo com espaços em branco ou maiúsculas, o que faria o filtro falhar.  
-- Considere normalizar o parâmetro `sort` para evitar problemas, por exemplo:
+---
+
+### 3. Filtragem e ordenação de agentes por data de incorporação
+
+**O que eu vi:**  
+No seu controller `agentesController.js`, você faz a filtragem e ordenação assim:
 
 ```js
-const sortParam = sort ? sort.trim().toLowerCase() : null;
+const sortParam = sort ? sort.trim().toLowerCase() : null
 if (sortParam && sortParam !== 'datadeincorporacao' && sortParam !== '-datadeincorporacao') {
-    return res.status(400).json({ erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"' });
+    return res.status(400).json({ erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"' })
 }
 ```
 
-> Para entender melhor como trabalhar com query params e validação, recomendo este vídeo:  
-> [Manipulação de Requisições e Respostas no Express.js](https://youtu.be/--TQwiNIw28)
+O problema aqui é que você está convertendo o parâmetro para minúsculas e comparando com `datadeincorporacao` em minúsculas, mas na mensagem de erro usa "dataDeIncorporacao" com letras maiúsculas em meio à palavra. Isso pode causar confusão.
 
----
-
-### 4. Mensagens de Erro Customizadas para Argumentos Inválidos
-
-Você fez um ótimo trabalho em validar UUIDs e campos obrigatórios, por exemplo:
+Além disso, na hora de ordenar, você usa:
 
 ```js
-if (!uuidValidate(id)) {
-    return res.status(400).json({
-        erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
-    })
+if (sortParam === 'dataDeIncorporacao' || sortParam === '-dataDeIncorporacao') {
+    // ordenação
 }
 ```
 
-Porém, os testes bônus indicam que as mensagens de erro customizadas para argumentos inválidos não passaram.
+Mas `sortParam` está em minúsculas, então essa condição nunca será verdadeira.
 
-**Possível causa raiz:**  
-- Pode ser que a mensagem de erro esperada no teste seja ligeiramente diferente, por exemplo, um texto diferente ou uma estrutura JSON diferente (exemplo: usar `error` em vez de `erro`, ou incluir um campo `message`).  
-- Esse tipo de detalhe é comum em APIs que precisam seguir um padrão rigoroso.  
-- Para garantir consistência e evitar duplicação, você poderia centralizar o tratamento de erros em um middleware ou função utilitária, por exemplo, criando um arquivo `utils/errorHandler.js` para padronizar as respostas.
-
-> Recomendo estudar sobre tratamento centralizado de erros para APIs com Express.js:  
-> [Validação e Tratamento de Erros em APIs Node.js](https://youtu.be/yNDCRAz7CM8)
-
----
-
-### 5. Validação no Endpoint `/casos` para Filtros por `agente_id` e `status`
-
-No `casosController.js`, você tem:
-
-```js
-if (agente_id) {
-    if (!uuidValidate(agente_id)) {
-        return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
-        })
-    }
-    casos = casosRepository.getCasosByAgente(agente_id)
-}
-
-if (status && status !== 'aberto' && status !== 'solucionado') {
-    return res.status(400).json({
-        erro: 'status deve ser "aberto" ou "solucionado".'
-    })
-} else if (status) {
-    casos = casosRepository.searchCasoStatus(status)
-}
-```
-
-Essa lógica pode causar um problema importante: se os dois filtros forem usados juntos (`agente_id` e `status`), você está sobrescrevendo o array `casos` com o resultado do último filtro, não aplicando os dois filtros em conjunto.
+**Por que isso impacta?**  
+Se a ordenação não está sendo aplicada porque a condição nunca é satisfeita, o teste de ordenação falha.
 
 **Como corrigir?**  
-Você deve aplicar os filtros de forma encadeada, filtrando o conjunto de dados passo a passo:
+Padronize o tratamento do parâmetro `sort` para que a verificação e ordenação usem o mesmo formato. Por exemplo:
 
 ```js
-let casos = casosRepository.getAll()
-
-if (agente_id) {
-    if (!uuidValidate(agente_id)) {
-        return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
-        })
-    }
-    casos = casos.filter(c => c.agente_id === agente_id)
+const sortParam = sort ? sort.trim() : null
+if (sortParam && sortParam !== 'dataDeIncorporacao' && sortParam !== '-dataDeIncorporacao') {
+    return res.status(400).json({ erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"' })
 }
 
-if (status) {
-    if (status !== 'aberto' && status !== 'solucionado') {
-        return res.status(400).json({
-            erro: 'status deve ser "aberto" ou "solucionado".'
-        })
-    }
-    casos = casos.filter(c => c.status.toLowerCase() === status.toLowerCase())
+if (sortParam === 'dataDeIncorporacao' || sortParam === '-dataDeIncorporacao') {
+    // ordenação
 }
-
-res.status(200).json(casos)
 ```
 
-Assim, os filtros funcionam juntos, e o usuário pode buscar casos de um agente específico com um status específico.
+Ou, se quiser comparar ignorando case, faça:
 
-> Esse é um erro clássico ao trabalhar com filtros encadeados. Para aprender mais sobre manipulação de arrays e filtros, veja:  
-> [Manipulação de Arrays no JavaScript](https://youtu.be/glSgUKA5LjE)
+```js
+const sortParam = sort ? sort.trim() : null
+if (sortParam && sortParam.toLowerCase() !== 'datadeincorporacao' && sortParam.toLowerCase() !== '-datadeincorporacao') {
+    return res.status(400).json({ erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"' })
+}
 
----
+if (sortParam && (sortParam.toLowerCase() === 'datadeincorporacao' || sortParam.toLowerCase() === '-datadeincorporacao')) {
+    // ordenação
+}
+```
 
-## 📝 Resumo Rápido para Você Focar
-
-- **Revise o endpoint `/casos/:id/agente` para garantir que as mensagens de erro e status codes estejam exatamente conforme esperado, com mensagens personalizadas consistentes.**
-- **Ajuste a busca `/casos/search` para garantir que o parâmetro `q` esteja bem documentado e validado, e que o endpoint responda corretamente em todos os casos.**
-- **Melhore a validação e normalização do parâmetro `sort` na rota `/agentes` para a ordenação por `dataDeIncorporacao`.**
-- **Padronize as mensagens de erro para argumentos inválidos, possivelmente centralizando o tratamento em um utilitário ou middleware.**
-- **Corrija a aplicação dos filtros no endpoint `/casos` para que `agente_id` e `status` possam ser usados em conjunto, aplicando os filtros de forma encadeada.**
-
----
-
-## 🌟 Considerações Finais
-
-Gustavo, você fez um ótimo trabalho e está muito próximo da perfeição! Seu código está limpo, organizado e funcional para os principais casos de uso. Os pontos que destaquei são ajustes finos que vão elevar ainda mais a qualidade da sua API e garantir que ela esteja alinhada com as melhores práticas de desenvolvimento e padrões REST.
-
-Continue nessa pegada, revisando cada detalhe com carinho, e aproveite para estudar os recursos que indiquei — eles vão te ajudar a consolidar o aprendizado e a ganhar ainda mais confiança para projetos futuros. 🚀💪
-
-Se precisar de ajuda para implementar algum desses ajustes, pode contar comigo! Estamos juntos nessa jornada. 😉
+Mas lembre-se de usar o mesmo formato nas comparações e na ordenação.
 
 ---
 
-### Recursos recomendados para você:
+### 4. Mensagens de erro customizadas para argumentos inválidos (agentes e casos)
 
-- [Fundamentos de API REST e Express.js](https://youtu.be/RSZHvQomeKE)  
-- [Manipulação de Requisições e Respostas no Express.js](https://youtu.be/--TQwiNIw28)  
-- [Validação e Tratamento de Erros em APIs Node.js](https://youtu.be/yNDCRAz7CM8)  
-- [Manipulação de Arrays no JavaScript](https://youtu.be/glSgUKA5LjE)  
-- [Documentação oficial do Express.js sobre roteamento](https://expressjs.com/pt-br/guide/routing.html)
+**O que eu vi:**  
+Você já tem mensagens personalizadas para erros 400 e 404, como:
+
+```js
+res.status(400).json({ erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.' })
+```
+
+Porém, os testes bônus falharam para mensagens customizadas, o que indica que talvez o formato do JSON ou o texto esperado esteja diferente do que o teste espera.
+
+**Como melhorar?**  
+- Padronize o nome da chave do erro no JSON (você usa sempre `"erro"`, o que está ótimo).
+- Confira se as mensagens estão exatamente iguais às do enunciado do desafio (às vezes um detalhe na mensagem pode causar falha).
+- Evite mensagens genéricas, prefira mensagens claras e específicas.
+- Você pode criar um middleware ou uma função utilitária para centralizar essas mensagens e garantir uniformidade.
 
 ---
 
-Parabéns novamente pela sua dedicação, Gustavo! Continue codando com essa vontade e atenção aos detalhes — o sucesso é questão de tempo. 🚀✨
+### 5. Validação do payload no PATCH para agentes e casos
 
-Abraço do seu Code Buddy! 🤖💙
+**O que eu vi:**  
+Você tem validações para payloads vazios no PATCH:
+
+```js
+if (Object.keys(updateData).length === 0) {
+    return res.status(400).json({
+        erro: 'Pelo menos um campo do agente deve ser atualizado.'
+    })
+}
+```
+
+E para agentes e casos, isso está implementado.
+
+**Por que o teste falhou?**  
+Pode ser que o teste envie um payload com campos inválidos (ex: tipos errados, campos extras) e seu código não esteja validando o formato do payload além da presença de chaves.
+
+**Como melhorar?**  
+- Implemente validações adicionais para garantir que os campos enviados no PATCH sejam apenas os esperados e com tipos corretos.
+- Você pode usar bibliotecas como Joi, Yup ou express-validator para facilitar isso, ou fazer validações manuais.
+- Isso vai evitar que payloads mal formatados passem e causem erros inesperados.
+
+---
+
+## 🗂️ Sobre a Estrutura do Projeto
+
+Sua estrutura está muito bem organizada e condiz com o esperado:
+
+```
+.
+├── controllers/
+│   ├── agentesController.js
+│   └── casosController.js
+├── repositories/
+│   ├── agentesRepository.js
+│   └── casosRepository.js
+├── routes/
+│   ├── agentesRoutes.js
+│   └── casosRoutes.js
+├── docs/
+│   └── swagger.js
+├── server.js
+├── package.json
+```
+
+Parabéns! Isso é essencial para escalabilidade e manutenção do projeto. Continue assim! 👏
+
+---
+
+## 📚 Recursos para Aprofundar e Corrigir
+
+- Para entender melhor o roteamento e organização com Express.js:  
+  https://expressjs.com/pt-br/guide/routing.html  
+  https://youtu.be/RSZHvQomeKE
+
+- Para validação de dados e tratamento de erros na API:  
+  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
+  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
+  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404
+
+- Para manipulação de arrays e filtros em JavaScript:  
+  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
+
+- Para entender melhor o fluxo de requisição e resposta HTTP:  
+  https://youtu.be/Bn8gcSQH-bc?si=Df4htGoVrV0NR7ri
+
+---
+
+## 📝 Resumo dos Principais Pontos para Focar
+
+- **Revisar mensagens de erro customizadas** para garantir que estejam exatamente como esperado e consistentes em toda a API.  
+- **Corrigir a lógica de ordenação do parâmetro `sort` no endpoint `/agentes`** para que o filtro funcione corretamente.  
+- **Aprimorar validação dos payloads no PATCH**, validando tipos e campos permitidos para evitar payloads inválidos.  
+- **Ajustar a função de busca por palavra-chave em `/casos/search`** para garantir que a pesquisa seja robusta e case-insensitive.  
+- **Testar manualmente os endpoints bônus**, especialmente `/casos/:id/agente`, para garantir que retornam os dados e erros esperados.
+
+---
+
+Gustavo, você está no caminho certo e entregou uma base sólida para essa API! 💪 Com esses ajustes, sua aplicação vai ficar ainda mais robusta, confiável e alinhada com as melhores práticas.
+
+Continue firme, revise com calma os pontos que destaquei e não hesite em experimentar as recomendações dos recursos que indiquei. Você tem tudo para se tornar um expert em APIs com Node.js e Express! 🚀
+
+Se precisar de mais ajuda, estou aqui para te apoiar! 👊😉
+
+Um abraço e sucesso na sua jornada de aprendizado! 👮‍♂️✨
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
