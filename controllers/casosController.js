@@ -15,10 +15,7 @@ function getAllCasos(req, res) {
             })
         }
 
-        casos = casos.filter(c => c.agente_id === agente_id)
-        if (casos.length === 0) {
-            return res.status(200).json([])
-        }
+        casos = casosRepository.getCasosByAgente(agente_id)
     }
 
     if (status && status !== 'aberto' && status !== 'solucionado') {
@@ -26,10 +23,7 @@ function getAllCasos(req, res) {
             erro: 'status deve ser "aberto" ou "solucionado".'
         })
     } else if (status) {
-        casos = casos.filter(c => c.status === status)
-        if (casos.length === 0) {
-            return res.status(200).json([])
-        }
+        casos = casosRepository.searchCasoStatus(status)
     }
 
     res.status(200).json(casos)
@@ -38,13 +32,14 @@ function getAllCasos(req, res) {
 // GET /casos/:id
 function getCasoById(req, res) {
     const { id } = req.params
-    const caso = casosRepository.getCasoById(id)
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
             erro: 'O ID fornecido para o caso é inválido. Certifique-se de usar um UUID válido.'
         })
     }
+
+    const caso = casosRepository.getCasoById(id)
 
     if (!caso) {
         return res.status(404).json({
@@ -73,7 +68,8 @@ function getAgenteByCaso(req, res) {
         })
     }
 
-    const agente = agentesRepository.getAgenteById(casoExists.agente_id)
+    const agente_id = casoExists.agente_id
+    const agente = agentesRepository.getAgenteById(agente_id)
 
     if (!agente) {
         return res.status(404).json({
@@ -87,24 +83,14 @@ function getAgenteByCaso(req, res) {
 // GET /casos/search
 function searchInCaso(req, res) {
     const { q } = req.query
-    
+
     if (!q || q.trim() === '') {
         return res.status(400).json({
             erro: 'Termo de busca "q" é obrigatório.'
         })
     }
     
-    const searchQuery = q.toLowerCase().trim()
-    let casos = casosRepository.getAll()
-
-    casos = casos.filter(c => 
-        c.titulo.toLowerCase().includes(searchQuery) || 
-        c.descricao.toLowerCase().includes(searchQuery)
-    )
-    
-    if (casos.length === 0) {
-        return res.status(200).json([])
-    }
+    const casos = casosRepository.searchCasoTermo(q)
 
     res.status(200).json(casos)
 }
@@ -139,7 +125,6 @@ function insertCaso(req, res) {
         agente_id
     }
     casosRepository.insertCaso(caso)
-    // console.log('caso inserido: ', caso.id)
     res.status(201).json(caso)
 }
 

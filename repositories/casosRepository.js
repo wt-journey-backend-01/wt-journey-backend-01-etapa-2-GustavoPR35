@@ -5,8 +5,7 @@ function getAll() {
 }
 
 function getCasoById(id) {
-    const caso = casos.find(c => c.id === id)
-    return caso
+    return casos.find(c => c.id === id)
 }
 
 function insertCaso(caso) {
@@ -27,10 +26,28 @@ function deleteCaso(id) {
     }
 }
 
+function getCasosByAgente(id) {
+    return casos.filter(c => c.agente_id === id)
+}
+
+function searchCasoTermo(q) {
+    const query = q.toLowerCase()
+    return casos.filter(c => {
+        return c.titulo.toLowerCase().includes(query) || c.descricao.toLowerCase().includes(query)
+    })
+}
+
+function searchCasoStatus(status) {
+    return casos.filter(c => c.status.toLowerCase() === status.toLowerCase())
+}
+
 module.exports = {
     getAll,
     getCasoById,
     insertCaso,
     updateCaso,
-    deleteCaso
+    deleteCaso,
+    getCasosByAgente,
+    searchCasoTermo,
+    searchCasoStatus
 }

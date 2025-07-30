@@ -5,8 +5,7 @@ function getAll() {
 }
 
 function getAgenteById(id) {
-    const agente = agentes.find(a => a.id === id)
-    return agente
+    return agentes.find(a => a.id === id)
 }
 
 function insertAgente(agente) {
@@ -27,10 +26,27 @@ function deleteAgente(id) {
     }
 }
 
+function getAgentesPorCargo(cargo) {
+    return agentes.filter(a => a.cargo.toLowerCase() === cargo.toLowerCase())
+}
+
+function getAgentesOrdenadosPorData(sort) {
+    const crescente = (sort === 'dataDeIncorporacao')
+    const agentesCopy = agentes.slice()
+    return agentesCopy.sort((a, b) => {
+        const dateA = new Date(a.dataDeIncorporacao).getTime()
+        const dateB = new Date(b.dataDeIncorporacao).getTime()
+            
+        return crescente ? dateA - dateB : dateB - dateA
+    })
+}
+
 module.exports = {
     getAll,
     getAgenteById,
     insertAgente,
     updateAgente,
-    deleteAgente
+    deleteAgente,
+    getAgentesPorCargo,
+    getAgentesOrdenadosPorData
 }

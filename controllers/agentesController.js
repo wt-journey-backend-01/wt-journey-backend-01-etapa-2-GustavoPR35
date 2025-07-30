@@ -13,22 +13,11 @@ function getAllAgentes(req, res) {
     }
 
     if (cargo) {
-        agentes = agentes.filter(a => a.cargo && a.cargo.toLowerCase() === cargo.toLowerCase())
-        
-        if (agentes.length === 0) {
-            return res.status(200).json([])
-        }
+        agentes = agentesRepository.getAgentesPorCargo(cargo)
     }
 
     if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
-        const crescente = (sort === 'dataDeIncorporacao')
-        
-        agentes.sort((a, b) => {
-            const dateA = new Date(a.dataDeIncorporacao).getTime()
-            const dateB = new Date(b.dataDeIncorporacao).getTime()
-            
-            return crescente ? dateA - dateB : dateB - dateA
-        })
+        agentes = agentesRepository.getAgentesOrdenadosPorData(sort)
     }
 
     res.status(200).json(agentes)
@@ -83,7 +72,6 @@ function insertAgente(req, res) {
         cargo
     }
     agentesRepository.insertAgente(agente)
-    // console.log('agente inserido: ', agente.id)
     res.status(201).json(agente)
 }
 
