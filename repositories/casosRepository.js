@@ -27,14 +27,10 @@ function deleteCaso(id) {
 }
 
 function searchCasoTermo(q) {
-    const query = q.toLowerCase()
+    const query = q.trim().toLowerCase()
     return casos.filter(c => {
         return c.titulo.toLowerCase().includes(query) || c.descricao.toLowerCase().includes(query)
     })
-}
-
-function searchCasoStatus(status) {
-    return casos.filter(c => c.status.toLowerCase() === status.toLowerCase())
 }
 
 module.exports = {

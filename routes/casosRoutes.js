@@ -144,7 +144,7 @@ router.get('/search', casosController.searchInCaso) // rota /casos/search está 
  *         description: ID do caso
  *     responses:
  *       200:
- *         description: Agente responsável pelo caso encontrado
+ *         description: retorna agente responsável pelo caso
  *         content:
  *           application/json:
  *             schema:

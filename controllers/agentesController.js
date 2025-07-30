@@ -8,19 +8,19 @@ function getAllAgentes(req, res) {
 
     const sortParam = sort ? sort.trim().toLowerCase() : null
     if (sortParam && sortParam !== 'datadeincorporacao' && sortParam !== '-datadeincorporacao') {
-        return res.status(400).json({ erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"' })
+        return res.status(400).json({ error: 'Parâmetro sort deve ser "datadeincorporacao" ou "-datadeincorporacao"' })
     }
 
     if (cargo) {
         agentes = agentes.filter(a => a.cargo.toLowerCase() === cargo.toLowerCase())
     }
 
-    if (sortParam === 'dataDeIncorporacao' || sortParam === '-dataDeIncorporacao') {
+    if (sortParam === 'datadeincorporacao' || sortParam === '-datadeincorporacao') {
         const agentesCopy = agentes.slice()
         agentesCopy.sort((a, b) => {
             const dateA = new Date(a.dataDeIncorporacao).getTime()
             const dateB = new Date(b.dataDeIncorporacao).getTime()
-            return sortParam === 'dataDeIncorporacao' ? dateA - dateB : dateB - dateA
+            return sortParam === 'datadeincorporacao' ? dateA - dateB : dateB - dateA
         })
         agentes = agentesCopy
     }
@@ -35,7 +35,7 @@ function getAgenteById(req, res) {
     // Validar UUID primeiro
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
+            error: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
@@ -43,7 +43,7 @@ function getAgenteById(req, res) {
     const agente = agentesRepository.getAgenteById(id)
     if (!agente) {
         return res.status(404).json({
-            erro: 'Agente não encontrado.'
+            message: 'Agente não encontrado.'
         })
     }
 
@@ -56,18 +56,18 @@ function insertAgente(req, res) {
 
     if (!nome || !dataDeIncorporacao || !cargo) {
         return res.status(400).json({
-            erro: 'Todos os dados são obrigatórios: nome, dataDeIncorporacao, cargo.'
+            error: 'Todos os dados são obrigatórios: nome, dataDeIncorporacao, cargo.'
         })
     }
 
     const dataRegex = /^\d{4}-\d{2}-\d{2}$/
     if (!dataRegex.test(dataDeIncorporacao)) {
-        return res.status(400).json({ erro: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
+        return res.status(400).json({ error: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
     }
     const dataIncorp = new Date(dataDeIncorporacao)
     const hoje = new Date()
     if (dataIncorp > hoje) {
-        return res.status(400).json({ erro: 'O campo dataDeIncorporacao não pode ser uma data futura.' })
+        return res.status(400).json({ error: 'O campo dataDeIncorporacao não pode ser uma data futura.' })
     }
 
     const agente = {
@@ -86,36 +86,36 @@ function putAgente(req, res) {
     const { nome, dataDeIncorporacao, cargo } = req.body
 
     if (req.body.id && req.body.id !== id) {
-        return res.status(400).json({ erro: 'Não é permitido alterar o campo de ID do agente.' })
+        return res.status(400).json({ error: 'Não é permitido alterar o campo de ID do agente.' })
     }
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
+            error: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {
         return res.status(404).json({
-            erro: 'Agente não encontrado.'
+            message: 'Agente não encontrado.'
         })
     }
 
     if (!nome || !dataDeIncorporacao || !cargo) {
         return res.status(400).json({
-            erro: 'Todos os campos do agente devem ser atualizados: nome, dataDeIncorporacao, cargo.'
+            error: 'Todos os campos do agente devem ser atualizados: nome, dataDeIncorporacao, cargo.'
         })
     }
 
     const dataRegex = /^\d{4}-\d{2}-\d{2}$/
     if (!dataRegex.test(dataDeIncorporacao)) {
-        return res.status(400).json({ erro: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
+        return res.status(400).json({ error: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
     }
     const dataIncorp = new Date(dataDeIncorporacao)
     const hoje = new Date()
     if (dataIncorp > hoje) {
-        return res.status(400).json({ erro: 'dataDeIncorporacao não pode ser uma data futura' })
+        return res.status(400).json({ error: 'dataDeIncorporacao não pode ser uma data futura' })
     }
 
     const agenteUpdate = {
@@ -135,36 +135,36 @@ function patchAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
+            error: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
     if (updateData.id && updateData.id !== id) {
-        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
+        return res.status(400).json({ error: 'Não é permitido alterar o campo id.' })
     }
 
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {
         return res.status(404).json({
-            erro: 'Agente não encontrado.'
+            message: 'Agente não encontrado.'
         })
     }
 
     if (Object.keys(updateData).length === 0) {
         return res.status(400).json({
-            erro: 'Pelo menos um campo do agente deve ser atualizado.'
+            error: 'Pelo menos um campo do agente deve ser atualizado.'
         })
     }
 
     if (updateData.dataDeIncorporacao) {
         const dataRegex = /^\d{4}-\d{2}-\d{2}$/
         if (!dataRegex.test(updateData.dataDeIncorporacao)) {
-            return res.status(400).json({ erro: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
+            return res.status(400).json({ error: 'O campo dataDeIncorporacao deve estar no formato YYYY-MM-DD.' })
         }
         const dataIncorp = new Date(updateData.dataDeIncorporacao)
         const hoje = new Date()
         if (dataIncorp > hoje) {
-            return res.status(400).json({ erro: 'O campo dataDeIncorporacao não pode ser uma data futura.' })
+            return res.status(400).json({ error: 'O campo dataDeIncorporacao não pode ser uma data futura.' })
         }
     }
 
@@ -183,14 +183,14 @@ function deleteAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
+            error: 'O ID fornecido para o agente é inválido. Certifique-se de usar um UUID válido.'
         })
     }
 
     const agenteExists = agentesRepository.getAgenteById(id)
     if (!agenteExists) {
         return res.status(404).json({
-            erro: 'Agente não encontrado.'
+            message: 'Agente não encontrado.'
         })
     }
 
