@@ -12,18 +12,44 @@ function getAllAgentes(req, res) {
         })
     }
 
+    if (sort && sort !== 'dataDeIncorporacao' && sort !== '-dataDeIncorporacao') {
+        return res.status(400).json({
+            erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"'
+        })
+    }
+
     if (cargo) {
         console.log("filtrando...")
-        agentes = agentes.filter(a => a.cargo.toLowerCase() === cargo.toLowerCase())
+        agentes = agentes.filter(a => a.cargo && a.cargo.toLowerCase() === cargo.toLowerCase())
+        
+        if (agentes.length === 0) {
+            return res.status(200).json([])
+        }
     }
 
     if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
         console.log("ordenando...")
         const crescente = sort === 'dataDeIncorporacao'
+        
         agentes.sort((a, b) => {
-            const dateA = new Date(a.dataDeIncorporacao)
-            const dateB = new Date(b.dataDeIncorporacao)
-            return crescente ? dateA - dateB : dateB - dateA
+            // Verificar se os objetos têm a propriedade dataDeIncorporacao
+            if (!a.dataDeIncorporacao && !b.dataDeIncorporacao) return 0
+            if (!a.dataDeIncorporacao) return crescente ? 1 : -1
+            if (!b.dataDeIncorporacao) return crescente ? -1 : 1
+            
+            // Converter para datas ISO (garantir formato YYYY-MM-DD)
+            const dateA = new Date(a.dataDeIncorporacao + 'T00:00:00.000Z')
+            const dateB = new Date(b.dataDeIncorporacao + 'T00:00:00.000Z')
+            
+            // Verificar se as datas são válidas
+            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0
+            if (isNaN(dateA.getTime())) return crescente ? 1 : -1
+            if (isNaN(dateB.getTime())) return crescente ? -1 : 1
+            
+            const timeA = dateA.getTime()
+            const timeB = dateB.getTime()
+            
+            return crescente ? timeA - timeB : timeB - timeA
         })
     }
 
@@ -33,14 +59,16 @@ function getAllAgentes(req, res) {
 // GET /agentes/:id
 function getAgenteById(req, res) {
     const { id } = req.params
-    const agente = agentesRepository.getAgenteById(id)
 
+    // Validar UUID primeiro
     if (!uuidValidate(id)) {
         return res.status(400).json({
             erro: 'Id inválido'
         })
     }
 
+    // Buscar agente
+    const agente = agentesRepository.getAgenteById(id)
     if (!agente) {
         return res.status(404).json({
             erro: 'Agente não encontrado'
@@ -85,6 +113,10 @@ function insertAgente(req, res) {
 function putAgente(req, res) {
     const { id } = req.params
     const { nome, dataDeIncorporacao, cargo } = req.body
+
+    if (req.body.id && req.body.id !== id) {
+        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
+    }
 
     if (!uuidValidate(id)) {
         return res.status(400).json({

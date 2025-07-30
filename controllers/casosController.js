@@ -83,6 +83,13 @@ function getAgenteByCaso(req, res) {
     }
 
     const agente = agentesRepository.getAgenteById(casoExists.agente_id)
+
+    if (!agente) {
+        return res.status(404).json({
+            erro: 'Agente não encontrado'
+        })
+    }
+
     res.status(200).json(agente)
 }
 
@@ -105,9 +112,7 @@ function searchInCaso(req, res) {
     )
     
     if (casos.length === 0) {
-        return res.status(200).json({
-            mensagem: 'Nenhum caso encontrado pela pesquisa.'
-        })
+        return res.status(200).json([])
     }
 
     res.status(200).json(casos)
@@ -151,6 +156,10 @@ function insertCaso(req, res) {
 function putCaso(req, res) {
     const { id } = req.params
     const { titulo, descricao, status, agente_id } = req.body
+
+    if (req.body.id && req.body.id !== id) {
+        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
+    }
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
