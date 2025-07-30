@@ -95,31 +95,6 @@ router.get('/search', casosController.searchInCaso)
 
 /**
  * @swagger
- * /casos/{id}:
- *   get:
- *     summary: Retorna um caso específico pelo ID
- *     tags: [Casos]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID do caso
- *     responses:
- *       200:
- *         description: Caso encontrado
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Caso'
- *       404:
- *         description: Caso não encontrado
- */
-router.get('/:id', casosController.getCasoById)
-
-/**
- * @swagger
  * /casos/{id}/agente:
  *   get:
  *     summary: Retorna o agente responsável por um caso
@@ -142,6 +117,31 @@ router.get('/:id', casosController.getCasoById)
  *         description: Caso ou agente não encontrado
  */
 router.get('/:id/agente', casosController.getAgenteByCaso)
+
+/**
+ * @swagger
+ * /casos/{id}:
+ *   get:
+ *     summary: Retorna um caso específico pelo ID
+ *     tags: [Casos]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do caso
+ *     responses:
+ *       200:
+ *         description: Caso encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Caso'
+ *       404:
+ *         description: Caso não encontrado
+ */
+router.get('/:id', casosController.getCasoById)
 
 /**
  * @swagger

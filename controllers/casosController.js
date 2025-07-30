@@ -8,16 +8,10 @@ function getAllCasos(req, res) {
 
     let casos = casosRepository.getAll()
 
-    if (casos.length === 0) {
-        return res.status(200).json({
-            mensagem: 'Não há nenhum caso cadastrado.'
-        })
-    }
-
     if (agente_id) {
         if (!uuidValidate(agente_id)) {
             return res.status(400).json({
-                erro: 'Id inválido'
+                erro: 'ID do caso inválido'
             })
         }
 
@@ -52,7 +46,7 @@ function getCasoById(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do caso inválido'
         })
     }
 
@@ -68,13 +62,14 @@ function getCasoById(req, res) {
 // GET /casos/:id/agente
 function getAgenteByCaso(req, res) {
     const { id } = req.params
-    const casoExists = casosRepository.getCasoById(id)
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do caso inválido'
         })
     }
+
+    const casoExists = casosRepository.getCasoById(id)
 
     if (!casoExists) {
         return res.status(404).json({
@@ -163,7 +158,7 @@ function putCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do caso inválido'
         })
     }
 
@@ -210,7 +205,7 @@ function patchCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do caso inválido'
         })
     }
 
@@ -258,7 +253,7 @@ function deleteCaso(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do caso inválido'
         })
     }
 

@@ -6,12 +6,6 @@ function getAllAgentes(req, res) {
     const { cargo, sort } = req.query
     let agentes = agentesRepository.getAll()
 
-    if (agentes.length === 0) {
-        return res.status(200).json({
-            mensagem: 'Não há nenhum agente cadastrado.'
-        })
-    }
-
     if (sort && sort !== 'dataDeIncorporacao' && sort !== '-dataDeIncorporacao') {
         return res.status(400).json({
             erro: 'Parâmetro sort deve ser "dataDeIncorporacao" ou "-dataDeIncorporacao"'
@@ -29,27 +23,13 @@ function getAllAgentes(req, res) {
 
     if (sort === 'dataDeIncorporacao' || sort === '-dataDeIncorporacao') {
         console.log("ordenando...")
-        const crescente = sort === 'dataDeIncorporacao'
+        const crescente = (sort === 'dataDeIncorporacao')
         
         agentes.sort((a, b) => {
-            // Verificar se os objetos têm a propriedade dataDeIncorporacao
-            if (!a.dataDeIncorporacao && !b.dataDeIncorporacao) return 0
-            if (!a.dataDeIncorporacao) return crescente ? 1 : -1
-            if (!b.dataDeIncorporacao) return crescente ? -1 : 1
+            const dateA = new Date(a.dataDeIncorporacao).getTime()
+            const dateB = new Date(b.dataDeIncorporacao).getTime()
             
-            // Converter para datas ISO (garantir formato YYYY-MM-DD)
-            const dateA = new Date(a.dataDeIncorporacao + 'T00:00:00.000Z')
-            const dateB = new Date(b.dataDeIncorporacao + 'T00:00:00.000Z')
-            
-            // Verificar se as datas são válidas
-            if (isNaN(dateA.getTime()) && isNaN(dateB.getTime())) return 0
-            if (isNaN(dateA.getTime())) return crescente ? 1 : -1
-            if (isNaN(dateB.getTime())) return crescente ? -1 : 1
-            
-            const timeA = dateA.getTime()
-            const timeB = dateB.getTime()
-            
-            return crescente ? timeA - timeB : timeB - timeA
+            return crescente ? dateA - dateB : dateB - dateA
         })
     }
 
@@ -63,7 +43,7 @@ function getAgenteById(req, res) {
     // Validar UUID primeiro
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do agente inválido'
         })
     }
 
@@ -120,7 +100,7 @@ function putAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do agente inválido'
         })
     }
 
@@ -164,7 +144,7 @@ function patchAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do agente inválido'
         })
     }
 
@@ -212,7 +192,7 @@ function deleteAgente(req, res) {
 
     if (!uuidValidate(id)) {
         return res.status(400).json({
-            erro: 'Id inválido'
+            erro: 'ID do agente inválido'
         })
     }
 
