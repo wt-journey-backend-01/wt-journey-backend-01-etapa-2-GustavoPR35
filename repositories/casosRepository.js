@@ -26,10 +26,6 @@ function deleteCaso(id) {
     }
 }
 
-function getCasosByAgente(id) {
-    return casos.filter(c => c.agente_id === id)
-}
-
 function searchCasoTermo(q) {
     const query = q.toLowerCase()
     return casos.filter(c => {
@@ -47,7 +43,5 @@ module.exports = {
     insertCaso,
     updateCaso,
     deleteCaso,
-    getCasosByAgente,
-    searchCasoTermo,
-    searchCasoStatus
+    searchCasoTermo
 }

@@ -48,6 +48,24 @@ const casosController = require('../controllers/casosController')
  *                  enum: [aberto, solucionado]
  *              agente_id:
  *                  type: string
+ *      Agente:
+ *          type: object
+ *          required:
+ *              - id
+ *              - nome
+ *              - dataDeIncorporacao
+ *              - cargo
+ *          properties:
+ *              id:
+ *                  type: string
+ *                  readOnly: true
+ *                  description: ID único gerado automaticamente
+ *              nome:
+ *                  type: string
+ *              dataDeIncorporacao:
+ *                  type: string
+ *              cargo:
+ *                  type: string
  */
 
 /**
@@ -88,7 +106,7 @@ router.get('/', casosController.getAllCasos)
  * @swagger
  * /casos/search:
  *   get:
- *     summary: Busca casos com termos especificados
+ *     summary: Pesquisa casos com os termos no título e/ou descrição
  *     tags: [Casos]
  *     parameters:
  *       - in: query
@@ -96,10 +114,10 @@ router.get('/', casosController.getAllCasos)
  *         schema:
  *           type: string
  *         required: true
- *         description: Termo de busca
+ *         description: Termos de pesquisa
  *     responses:
  *       200:
- *         description: Resultados da busca
+ *         description: Retorna casos que possuem os termos de pesquisa no título ou descrição
  *         content:
  *           application/json:
  *             schema:
@@ -107,7 +125,7 @@ router.get('/', casosController.getAllCasos)
  *               items:
  *                 $ref: '#/components/schemas/Caso'
  *       400:
- *         description: Termo de busca não fornecido
+ *         description: Termos de pesquisa não fornecidos
  */
 router.get('/search', casosController.searchInCaso) // rota /casos/search está declarada antes da rota /casos/:id
 
@@ -126,7 +144,7 @@ router.get('/search', casosController.searchInCaso) // rota /casos/search está 
  *         description: ID do caso
  *     responses:
  *       200:
- *         description: Agente responsável pelo caso
+ *         description: Agente responsável pelo caso encontrado
  *         content:
  *           application/json:
  *             schema:

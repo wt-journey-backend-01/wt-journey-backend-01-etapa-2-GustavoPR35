@@ -15,15 +15,16 @@ function getAllCasos(req, res) {
             })
         }
 
-        casos = casosRepository.getCasosByAgente(agente_id)
+        casos = casos.filter(c => c.agente_id === agente_id)
     }
 
-    if (status && status !== 'aberto' && status !== 'solucionado') {
+    const statusParam = status ? status.trim().toLowerCase() : null
+    if (statusParam && statusParam !== 'aberto' && statusParam !== 'solucionado') {
         return res.status(400).json({
-            erro: 'status deve ser "aberto" ou "solucionado".'
+            erro: 'Status deve ser "aberto" ou "solucionado".'
         })
-    } else if (status) {
-        casos = casosRepository.searchCasoStatus(status)
+    } else if (statusParam) {
+        casos = casos.filter(c => c.status.toLowerCase() === statusParam.toLowerCase())
     }
 
     res.status(200).json(casos)
@@ -43,7 +44,7 @@ function getCasoById(req, res) {
 
     if (!caso) {
         return res.status(404).json({
-            erro: 'Caso não encontrado'
+            erro: 'Caso não encontrado.'
         })
     }
 
@@ -64,7 +65,7 @@ function getAgenteByCaso(req, res) {
 
     if (!casoExists) {
         return res.status(404).json({
-            erro: 'Caso não encontrado'
+            erro: 'Caso não encontrado.'
         })
     }
 
@@ -73,7 +74,7 @@ function getAgenteByCaso(req, res) {
 
     if (!agente) {
         return res.status(404).json({
-            erro: 'Agente não encontrado'
+            erro: 'Agente não encontrado.'
         })
     }
 
@@ -87,7 +88,7 @@ function searchInCaso(req, res) {
 
     if (!q || q.trim() === '') {
         return res.status(400).json({
-            erro: 'Termo de busca "q" é obrigatório.'
+            erro: 'O termo de pesquisa "q" é obrigatório.'
         })
     }
     
@@ -102,13 +103,13 @@ function insertCaso(req, res) {
 
     if (!titulo || !descricao || !status || !agente_id) {
         return res.status(400).json({
-            erro: 'Todos os dados são obrigatórios: titulo, descricao, status, agente_id'
+            erro: 'Todos os dados são obrigatórios: titulo, descricao, status, agente_id.'
         })
     }
 
     if (status !== 'aberto' && status !== 'solucionado') {
         return res.status(400).json({
-            erro: 'status deve ser "aberto" ou "solucionado".'
+            erro: 'Status deve ser "aberto" ou "solucionado".'
         })
     }
 
@@ -135,7 +136,7 @@ function putCaso(req, res) {
     const { titulo, descricao, status, agente_id } = req.body
 
     if (req.body.id && req.body.id !== id) {
-        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
+        return res.status(400).json({ erro: 'Não é permitido alterar o campo de ID do caso.' })
     }
 
     if (!uuidValidate(id)) {
@@ -153,13 +154,13 @@ function putCaso(req, res) {
 
     if (!titulo || !descricao || !status || !agente_id) {
         return res.status(400).json({
-            erro: 'Todos os campos devem ser atualizados: titulo, descricao, status, agente_id'
+            erro: 'Todos os campos do caso devem ser atualizados: titulo, descricao, status, agente_id.'
         })
     }
 
     if (status !== 'aberto' && status !== 'solucionado') {
         return res.status(400).json({
-            erro: 'status deve ser "aberto" ou "solucionado".'
+            erro: 'Status deve ser "aberto" ou "solucionado".'
         })
     }
 
@@ -192,7 +193,7 @@ function patchCaso(req, res) {
     }
 
     if (updateData.id && updateData.id !== id) {
-        return res.status(400).json({ erro: 'Não é permitido alterar o campo id.' })
+        return res.status(400).json({ erro: 'Não é permitido alterar o campo de ID do caso.' })
     }
 
     const casoExists = casosRepository.getCasoById(id)
@@ -204,13 +205,13 @@ function patchCaso(req, res) {
 
     if (Object.keys(updateData).length === 0) {
         return res.status(400).json({
-            erro: 'Pelo menos um campo deve ser atualizado.'
+            erro: 'Pelo menos um campo do caso deve ser atualizado.'
         })
     }
 
     if (updateData.status && updateData.status !== 'aberto' && updateData.status !== 'solucionado') {
         return res.status(400).json({
-            erro: 'status deve ser "aberto" ou "solucionado".'
+            erro: 'Status deve ser "aberto" ou "solucionado".'
         })
     }
 

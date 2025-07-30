@@ -12,6 +12,7 @@ const agentesController = require('../controllers/agentesController')
  *     Agente:
  *       type: object
  *       required:
+ *         - id
  *         - nome
  *         - dataDeIncorporacao
  *         - cargo
